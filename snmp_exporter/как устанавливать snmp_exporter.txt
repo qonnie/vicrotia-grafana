@@ -1,0 +1,31 @@
+Prometheus не может напрямую читать метрики из Mikrotik. Вместо этого он обращается в специальный exporter, который выдаёт метрики в нужном формате.
+ Mikrotik позволяет экспортировать метрики с помощью протокола SNMP.
+
+wget https://github.com/prometheus/snmp_exporter/releases/download/с_нужной_версией
+tar xzf snmp_exporter.tar.gz
+
+создание systemd сервиса:
+sudo vi /etc/systemd/system/snmp_exporter.service
+
+Туда вставляем:в
+[Unit]
+Description=SNMP Exporter
+After=network-online.target
+
+[Service]
+User=adminet
+Restart=on-failure
+ExecStart=/usr/local/bin/snmp_exporter --config.file=/home/adminet/snmp_exporter/snmp_exporter-0.30.1.linux-amd64/snmp.yml
+
+[Install]
+WantedBy=multi-user.target
+
+Дальше необходимо скопировать snmp_exporter:
+sudo cp ./snmp_exporter-0.30.1.linux-amd64/snmp_exporter /usr/local/bin/snmp_exporter
+
+После этого стартовать сервис:
+sudo systemctl enable snmp_exporter
+sudo systemctl start snmp_exporter
+
+Источник: https://dernasherbrezon.com/posts/prometheus-monitoring-mikrotik/
+Источник2: https://github.com/prometheus/snmp_exporter
